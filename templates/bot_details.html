@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Детали бота</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #555;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .copy-link {
+            color: #007bff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            cursor: pointer; /* Change cursor to pointer */
+            display: inline-flex;  /* Display as inline flex container */
+            align-items: center;   /* Align items vertically */
+        }
+
+        .copy-link:hover {
+            color: #0056b3;
+        }
+
+        .copy-link i {
+            margin-left: 5px;  /* Add space between link and icon */
+            font-size: 0.8em; /* Adjust the size of the icon */
+        }
+
+        .link-button {
+            display: inline-block;
+            padding: 12px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .link-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Детали бота: [Название бота]</h1>
+        <p><strong>Приветственное сообщение:</strong> [Текст приветственного сообщения]</p>
+
+        <h2>Статистика</h2>
+        <ul>
+            <li>Переходы с площадок:
+                <ul>
+                    <li>Площадка 1: [Количество]</li>
+                    <li>Площадка 2: [Количество]</li>
+                    <!-- Добавьте больше площадок -->
+                </ul>
+            </li>
+            <li>Покупки: [Количество]</li>
+            <li>Общая прибыль: [Сумма] руб.</li>
+        </ul>
+
+        <h2>Ссылки на бота</h2>
+        <ul>
+            <li><a href="#" class="copy-link" data-link="https://example.com/bot1">Ссылка 1 <i class="fas fa-copy"></i></a></li>
+            <li><a href="#" class="copy-link" data-link="https://example.com/bot2">Ссылка 2 <i class="fas fa-copy"></i></a></li>
+            <!-- Добавьте больше ссылок -->
+        </ul>
+
+        <a href="create_link.html" class="link-button">Добавить новую ссылку</a>
+        <br>
+        <a href="bot_list.html" class="link-button">Вернуться к списку ботов</a>
+    </div>
+
+    <script>
+        const copyLinks = document.querySelectorAll('.copy-link');
+
+        copyLinks.forEach(link => {
+            link.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent navigation
+                const linkToCopy = this.dataset.link; // Get the link from data attribute
+
+                navigator.clipboard.writeText(linkToCopy)
+                    .then(() => {
+                        alert('Ссылка скопирована: ' + linkToCopy); // Optional: alert the user
+                    })
+                    .catch(err => {
+                        console.error('Не удалось скопировать ссылку: ', err);
+                        alert('Не удалось скопировать ссылку.');
+                    });
+            });
+        });
+    </script>
+</body>
+</html>

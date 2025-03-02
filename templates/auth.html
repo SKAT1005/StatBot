@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Авторизация / Регистрация</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 400px;
+            max-width: 90%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+            text-align: left;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .error {
+            color: #dc3545;
+            margin-top: 10px;
+        }
+
+        .toggle-form {
+            color: #007bff;
+            text-decoration: none;
+            cursor: pointer;
+            display: block;
+            margin-top: 15px;
+            transition: color 0.3s ease;
+        }
+
+        .toggle-form:hover {
+            color: #0056b3;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="formTitle">Авторизация</h1>
+
+        <form id="loginForm">
+            <label for="loginEmail">Email:</label>
+            <input type="email" id="loginEmail" name="email" required>
+
+            <label for="loginPassword">Пароль:</label>
+            <input type="password" id="loginPassword" name="password" required>
+            <button type="submit">Войти</button>
+            <a href="#" class="toggle-form" id="showRegisterForm">Нет аккаунта? Зарегистрироваться</a>
+        </form>
+
+        <form id="registerForm" class="hidden">
+            <label for="registerName">Имя:</label>
+            <input type="text" id="registerName" name="name" required>
+
+            <label for="registerEmail">Email:</label>
+            <input type="email" id="registerEmail" name="email" required>
+
+            <label for="registerPassword">Пароль:</label>
+            <input type="password" id="registerPassword" name="password" required>
+
+            <button type="submit">Зарегистрироваться</button>
+            <a href="#" class="toggle-form" id="showLoginForm">Уже есть аккаунт? Войти</a>
+        </form>
+
+        <p class="error" id="errorMessage"></p>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const showRegisterFormLink = document.getElementById('showRegisterForm');
+        const showLoginFormLink = document.getElementById('showLoginForm');
+        const formTitle = document.getElementById('formTitle');
+
+        showRegisterFormLink.addEventListener('click', function(event) {
+            event.preventDefault();
+            loginForm.classList.add('hidden');
+            registerForm.classList.remove('hidden');
+            formTitle.textContent = 'Регистрация';
+        });
+
+        showLoginFormLink.addEventListener('click', function(event) {
+            event.preventDefault();
+            registerForm.classList.add('hidden');
+            loginForm.classList.remove('hidden');
+            formTitle.textContent = 'Авторизация';
+        });
+
+
+        loginForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            // Отправка данных на сервер
+        });
+
+        registerForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            // Отправка данных на сервер
+        });
+    </script>
+</body>
+</html>

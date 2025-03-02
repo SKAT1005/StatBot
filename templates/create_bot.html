@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создать бота</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 500px;
+            max-width: 90%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+            text-align: left;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        textarea {
+            height: 120px; /* Увеличиваем высоту текстового поля */
+            resize: vertical; /* Разрешаем вертикальное изменение размера */
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        a {
+            display: block;
+            margin-top: 20px;
+            color: #007bff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Создать нового бота</h1>
+        <form id="createBotForm">
+            <label for="botName">Название бота:</label>
+            <input type="text" id="botName" name="name" required>
+
+            <label for="greetingMessage">Приветственное сообщение:</label>
+            <textarea id="greetingMessage" name="greeting" rows="4" required></textarea>
+
+            <label for="channel">Канал для доступа:</label>
+            <input type="text" id="channel" name="channel" required>
+
+            <label for="productPrice">Цена продукта:</label>
+            <input type="number" id="productPrice" name="price" required>
+
+            <button type="submit">Создать бота</button>
+        </form>
+
+        <a href="bot_list.html">Отмена</a>
+    </div>
+
+    <script>
+        document.getElementById('createBotForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            // Отправка данных на сервер
+        });
+    </script>
+</body>
+</html>
