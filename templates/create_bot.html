@@ -85,30 +85,38 @@
 <body>
     <div class="container">
         <h1>Создать нового бота</h1>
-        <form id="createBotForm">
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
             <label for="botName">Название бота:</label>
             <input type="text" id="botName" name="name" required>
 
-            <label for="greetingMessage">Приветственное сообщение:</label>
-            <textarea id="greetingMessage" name="greeting" rows="4" required></textarea>
+            <label for="botName">Название товара:</label>
+            <input type="text" id="botName" name="product_name" required>
 
-            <label for="channel">Канал для доступа:</label>
+            <label for="greetingMessage">Приветственное сообщение:</label>
+            <textarea id="greetingMessage" name="hello_message" rows="4" required></textarea>
+
+            <label for="channel">ID канала:</label>
             <input type="text" id="channel" name="channel" required>
 
             <label for="productPrice">Цена продукта:</label>
             <input type="number" id="productPrice" name="price" required>
 
+            <label for="productPrice">Сколько месяцев длится подписка:</label>
+            <input type="number" id="productPrice" name="month" required>
+
             <button type="submit">Создать бота</button>
         </form>
 
-        <a href="bot_list.html">Отмена</a>
+        <a href="{% url 'bot_list' %}">Отмена</a>
     </div>
 
-    <script>
-        document.getElementById('createBotForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            // Отправка данных на сервер
-        });
-    </script>
 </body>
 </html>

@@ -86,32 +86,25 @@
 </head>
 <body>
     <div class="container">
-        <h1>Детали бота: [Название бота]</h1>
-        <p><strong>Приветственное сообщение:</strong> [Текст приветственного сообщения]</p>
+        <h1>Детали бота: {{ bot.name }}</h1>
+        <p><strong>Приветственное сообщение:</strong> {{ bot.hello_message }}</p>
 
         <h2>Статистика</h2>
         <ul>
-            <li>Переходы с площадок:
+            <li>Название ссылки/Сколько людей перешло/сколько людей купило подписку/Прибыль с сылки:
                 <ul>
-                    <li>Площадка 1: [Количество]</li>
-                    <li>Площадка 2: [Количество]</li>
-                    <!-- Добавьте больше площадок -->
+                    {% for link in links %}
+                    <li><a href="#" class="copy-link" data-link="{{ link.link }}">{{ link.name }} <i class="fas fa-copy"></i></a>:
+                        {{ link.state }}</li>
+                    {% endfor %}
                 </ul>
             </li>
-            <li>Покупки: [Количество]</li>
-            <li>Общая прибыль: [Сумма] руб.</li>
+            <li>Общая прибыль: {bot.income} руб.</li>
         </ul>
 
-        <h2>Ссылки на бота</h2>
-        <ul>
-            <li><a href="#" class="copy-link" data-link="https://example.com/bot1">Ссылка 1 <i class="fas fa-copy"></i></a></li>
-            <li><a href="#" class="copy-link" data-link="https://example.com/bot2">Ссылка 2 <i class="fas fa-copy"></i></a></li>
-            <!-- Добавьте больше ссылок -->
-        </ul>
-
-        <a href="create_link.html" class="link-button">Добавить новую ссылку</a>
+        <a href="{% url 'create_link' %}" class="link-button">Добавить новую ссылку</a>
         <br>
-        <a href="bot_list.html" class="link-button">Вернуться к списку ботов</a>
+        <a href="{% url 'bot_list' %}" class="link-button">Вернуться к списку ботов</a>
     </div>
 
     <script>
