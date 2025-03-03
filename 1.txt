@@ -1,3 +1,4 @@
+Напиши django views для этого шаблона
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -85,20 +86,10 @@
 <body>
     <div class="container">
         <h1>Создать нового бота</h1>
-        {% if messages %}
-            <ul class="messages">
-                {% for message in messages %}
-                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
         <form method="post">
             {% csrf_token %}
             <label for="botName">Название бота:</label>
             <input type="text" id="botName" name="name" required>
-
-            <label for="botName">Название товара:</label>
-            <input type="text" id="botName" name="product_name" required>
 
             <label for="greetingMessage">Приветственное сообщение:</label>
             <textarea id="greetingMessage" name="hello_message" rows="4" required></textarea>

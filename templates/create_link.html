@@ -80,21 +80,23 @@
 <body>
     <div class="container">
         <h1>Создать новую ссылку</h1>
-        <form id="createLinkForm">
+         {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
             <label for="linkName">Название ссылки:</label>
             <input type="text" id="linkName" name="name" required>
 
             <button type="submit">Создать</button>
         </form>
 
-        <a href="bot_details.html">Отмена</a>
+        <a href="{% url 'bot_detail' bot.pk %}">Отмена</a>
     </div>
 
-    <script>
-        document.getElementById('createLinkForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            // Отправка данных на сервер
-        });
-    </script>
 </body>
 </html>

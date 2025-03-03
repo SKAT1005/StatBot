@@ -2,11 +2,10 @@
 import hashlib
 import hmac
 import urllib.parse
-import Telebot
 
 # Секретный ключ. Можно найти на странице настроек,
 # в личном кабинете платежной формы.
-secret_key = '2y2aw4oknnke80bp1a8fniwuuq7tdkwmmuq7vwi4nzbr8z1182ftbn6p8mhw3bhz'
+secret_key = 'b47792ff804f0e5cb982e6fe2844e1274c311b0b20675e4b8321132c9346b7e8'
 linktoform = 'https://demo.payform.ru/'
 
 def create_hmac(data, secret_key):

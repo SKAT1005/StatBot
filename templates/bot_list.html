@@ -81,37 +81,35 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Список ваших ботов</h1>
+<div class="container">
+    <h1>Список ваших ботов</h1>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Название бота</th>
-                    <th>Прибыль (общая)</th>
-                    <th>Действия</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Бот #1</td>
-                    <td>15000 руб.</td>
-                    <td><a href="bot_details.html?id=1">Подробнее</a></td>
-                </tr>
-                <tr>
-                    <td>Бот #2</td>
-                    <td>8000 руб.</td>
-                    <td><a href="bot_details.html?id=2">Подробнее</a></td>
-                </tr>
-                <!-- Добавьте больше строк для каждого бота -->
-            </tbody>
-        </table>
+    <table>
+        <thead>
+        <tr>
+            <th>Название бота</th>
+            <th>Прибыль (общая)</th>
+            <th>Действия</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% if bots %}
+        {% for bot in bots %}
+            <tr>
+                <td>{{ bot.name }}</td>
+                <td>{{ bot.income }} руб.</td>
+                <td><a href="{% url 'bot_detail' bot.pk %}" {{ bot.id }}>Подробнее</a></td>
+            </tr>
+        {% endfor %}
+        {% endif %}
+        </tbody>
+    </table>
 
-        <a href="create_bot.html" class="create-bot-link">Создать нового бота</a>
-    </div>
+    <a href="{% url 'create_bot' %}" class="create-bot-link">Создать нового бота</a>
+</div>
 
-    <script>
-        // Здесь можно добавить JavaScript для фильтрации/сортировки списка
-    </script>
+<script>
+    // Здесь можно добавить JavaScript для фильтрации/сортировки списка
+</script>
 </body>
 </html>
