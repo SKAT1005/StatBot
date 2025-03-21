@@ -2,6 +2,10 @@ import hashlib
 import hmac
 import json
 import os
+import urllib.parse
+from collections import OrderedDict
+from collections.abc import MutableMapping
+from xml.sax import parse
 
 from django.http import HttpResponseBadRequest, HttpResponseForbidden, HttpResponse
 from django.shortcuts import render, redirect
@@ -165,13 +169,100 @@ def create_link(request, pk):
     return render(request, 'create_link.html', context={'bot': user_bot})
 
 
+def convert_string_to_json(input_string):
+    """
+    Преобразует строку в формате URL encoded query string в JSON (OrderedDict).
+    Сохраняет порядок ключей и корректно обрабатывает вложенные структуры данных,
+    особенно массив products.
+
+    Args:
+        input_string: Строка, которую нужно преобразовать.  Должна быть bytes.
+
+    Returns:
+        OrderedDict, представляющий JSON, или None, если преобразование не удалось.
+    """
+    try:
+        # Декодируем bytes строку в unicode строку
+        decoded_string = input_string.decode('utf-8')
+
+        # Используем urllib.parse.parse_qs для разбора строки запроса URL
+        parsed_data = urllib.parse.parse_qs(decoded_string, keep_blank_values=True)
+
+        # Преобразуем значения списков в отдельные значения, если список содержит только один элемент
+        # и сохраняем порядок ключей
+        ordered_data = OrderedDict()
+        for key in urllib.parse.parse_qsl(decoded_string, keep_blank_values=True):  # Сохраняем порядок!
+            if key[0] in parsed_data:
+                value = parsed_data[key[0]]
+                if len(value) == 1:
+                    ordered_data[key[0]] = value[0]  # Преобразуем список из одного элемента в сам элемент
+                else:
+                    ordered_data[key[0]] = value
+
+        # Обрабатываем вложенную структуру 'products'
+        products = []
+        product_keys = {}
+        for key, value in list(ordered_data.items()):  # Итерируемся по копии ключей, чтобы можно было удалять ключи
+            if 'products' in key:
+                # Разбираем ключ, чтобы определить индекс продукта и название поля
+                parts = key.split('[')
+                if len(parts) >= 3:  # Проверяем, что ключ имеет правильную структуру
+                    index = int(parts[1].replace(']', ''))
+                    field = parts[2].replace(']', '')
+
+                    # Создаем словарь продукта, если он еще не существует
+                    if index not in product_keys:
+                        product_keys[index] = OrderedDict()  # OrderedDict для сохранения порядка полей продукта
+
+                    product_keys[index][field] = value
+
+                    del ordered_data[key]  # Удаляем ключ, чтобы не мешал дальнейшей обработке
+
+        # Преобразуем словарь индексов в список продуктов
+        for index in sorted(product_keys.keys()):
+            # Гарантируем определенный порядок полей внутри каждого продукта
+            product = OrderedDict()
+            product['name'] = product_keys[index].get('name')
+            product['price'] = product_keys[index].get('price')
+            product['quantity'] = product_keys[index].get('quantity')
+            product['sum'] = product_keys[index].get('sum')
+            products.append(product)
+
+        if products:
+            ordered_data['products'] = products
+
+        return ordered_data
+    except Exception as e:
+        print(f"Ошибка при преобразовании в JSON: {e}")
+        return None
+
+def sign(data, secret_key):
+    import hashlib
+    import hmac
+    import json
+    deep_int_to_string(data)
+    data_json = json.dumps(data, sort_keys=True, ensure_ascii=False, separators=(',', ':')).replace("/", "\\/")
+    return hmac.new(secret_key.encode('utf8'), data_json.encode('utf8'), hashlib.sha256).hexdigest()
+
+def deep_int_to_string(dictionary):
+    for key, value in dictionary.items():
+        if isinstance(value, MutableMapping):
+            deep_int_to_string(value)
+        elif isinstance(value, list) or isinstance(value, tuple):
+            for k, v in enumerate(value):
+                deep_int_to_string({str(k): v})
+        else: dictionary[key] = str(value)
+
+def parse_data(data):
+    data = dict(data)
+    print(data['order_id'])
 
 @csrf_exempt  # Disable CSRF protection for this view (needed for webhooks)
 def webhook_view(request):
     """
     Django view to handle webhook requests with HMAC verification.
     """
-    secret_key = os.environ.get('SECRET_KEY', 'b47792ff804f0e5cb982e6fe2844e1274c311b0b20675e4b8321132c9346b7e8')  # Get secret from env
+    secret_key = 'b47792ff804f0e5cb982e6fe2844e1274c311b0b20675e4b8321132c9346b7e8'  # Get secret from env
 
     # Verify that the request is a POST request
     if request.method != 'POST':
@@ -187,45 +278,20 @@ def webhook_view(request):
 
     # Verify the signature
     try:
-        request_body_dict = json.loads(request_body.decode('utf-8'))
+        request_body_dict = convert_string_to_json(request_body)
     except json.JSONDecodeError:
         return HttpResponseBadRequest('Invalid JSON format')
+    expected_signature = sign(request_body_dict, secret_key)
 
-
-    if not verify_hmac(request_body_dict, secret_key, signature):
+    if not hmac.compare_digest(expected_signature, signature):
         return HttpResponseForbidden('Signature is invalid')
 
     # Process the webhook data
     try:
-        process_webhook_data(request_body_dict) # Replace with your processing logic
+        parse_data(request_body_dict) # Replace with your processing logic
         return HttpResponse('Webhook received and processed', status=200)
     except Exception as e:
         # Log the error
         print(f"Error processing webhook: {e}")  # Replace with proper logging
         return HttpResponse(f"Error processing webhook: {e}", status=500)
-
-
-
-def verify_hmac(data, secret_key, signature):
-    """
-    Verifies the HMAC signature of the provided data.
-
-    Args:
-        data: The data (usually a dictionary) that was signed.
-        secret_key: The secret key used to generate the signature.
-        signature: The signature to verify.
-
-    Returns:
-        True if the signature is valid, False otherwise.
-    """
-    message = json.dumps(data, sort_keys=True).encode('utf-8')  # Consistent JSON serialization
-    expected_signature = hmac.new(secret_key.encode('utf-8'), message, hashlib.sha256).hexdigest()
-    return hmac.compare_digest(expected_signature, signature)
-
-
-def process_webhook_data(data):
-    order = Order.objects.get(id=data['order_id'])
-    if data['payment_status'] == 'success':
-        link = bot.create_chat_invite_link(chat_id=order.link.bot.channel, member_limit=1, creates_join_request=False)
-        bot.send_message(chat_id=order.chat_id, text='Оплата прошла успешно. Вы можете присоедениться к каналу', reply_markup=invite(link))
 

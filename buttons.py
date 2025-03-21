@@ -1,12 +1,12 @@
 
 
-from create_pay_link import generate_link
+from create_pay_link import generate_payment_link
 from telebot.types import WebAppInfo, InlineKeyboardButton, InlineKeyboardMarkup
 
 def pay_murkup(order):
     markup = InlineKeyboardMarkup()
-    link = generate_link(order)
-    pay = InlineKeyboardButton('Оплатить', url=link) #web_app=WebAppInfo(link))
+    link = generate_payment_link(order)
+    pay = InlineKeyboardButton('Оплатить', web_app=WebAppInfo(link)) #web_app=WebAppInfo(link))
     markup.add(pay)
     return markup
 
