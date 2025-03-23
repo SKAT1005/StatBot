@@ -4,25 +4,29 @@ from urllib.parse import urlencode
 from const import bot
 
 
-def generate_payment_link(order):
+def generate_payment_link():
+
     linktoform = 'https://artmeup.payform.ru/'
     secret_key = 'b47792ff804f0e5cb982e6fe2844e1274c311b0b20675e4b8321132c9346b7e8'
 
     data = {
-        'order_id': order.id,
+        # хххх - номер заказ в системе интернет-магазина
+        'order_id': 12,
+
+        # перечень товаров заказа
         'products': [
             {
-                'name': f'{order.link.bot.product_name}',
-                'price': f'{int(order.link.bot.price)}',
+                'name': 'Товар 1',
+                'price': '123',
                 'quantity': '1',
             },
         ],
+
         'do': 'pay',
         'urlReturn' : f'https://t.me/{bot.get_me().username}',
         'urlSuccess': f'https://t.me/{bot.get_me().username}',
         'urlNotification': 'https://slavishly-prospering-drake.cloudpub.ru/webhook',
         'discount_value': 0.00,
-        'demo_mode': 1,
         'npd_income_type': 'FROM_INDIVIDUAL',
     }
     # подписываем с помощью кастомной функции sign (см ниже)
@@ -32,7 +36,6 @@ def generate_payment_link(order):
     link = linktoform + '?' + urlencode(http_build_query(data))
 
     return link
-
 
 def sign(data, secret_key):
     import hashlib
@@ -48,7 +51,6 @@ def sign(data, secret_key):
     # создаем подпись с помощью библиотеки hmac и возвращаем ее
     return hmac.new(secret_key.encode('utf8'), data_json.encode('utf8'), hashlib.sha256).hexdigest()
 
-
 def deep_int_to_string(dictionary):
     for key, value in dictionary.items():
         if isinstance(value, MutableMapping):
@@ -56,10 +58,8 @@ def deep_int_to_string(dictionary):
         elif isinstance(value, list) or isinstance(value, tuple):
             for k, v in enumerate(value):
                 deep_int_to_string({str(k): v})
-        else:
-            dictionary[key] = str(value)
-
-
+        else: dictionary[key] = str(value)
+                
 def http_build_query(dictionary, parent_key=False):
     items = []
     for key, value in dictionary.items():
@@ -72,3 +72,9 @@ def http_build_query(dictionary, parent_key=False):
         else:
             items.append((new_key, value))
     return dict(items)
+
+
+
+n = generate_payment_link()
+
+print(n)
