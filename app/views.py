@@ -2,6 +2,8 @@ import hashlib
 import hmac
 import json
 import os
+import urllib.parse
+from collections import OrderedDict
 
 from django.http import HttpResponseBadRequest, HttpResponseForbidden, HttpResponse
 from django.shortcuts import render, redirect
@@ -12,6 +14,7 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 
 from app.models import Manager, Bots, Link, Order
+from buttons import invite
 from const import bot
 
 
@@ -165,7 +168,51 @@ def create_link(request, pk):
     return render(request, 'create_link.html', context={'bot': user_bot})
 
 
+def convert_string_to_json(input_string):
+    """
+    Преобразует строку в формате URL encoded query string в JSON (OrderedDict).
+    Сохраняет порядок ключей и корректно обрабатывает вложенные структуры данных,
+    особенно массив products.
 
+    Args:
+        input_string: Строка, которую нужно преобразовать.  Должна быть bytes.
+
+    Returns:
+        OrderedDict, представляющий JSON, или None, если преобразование не удалось.
+    """
+    # Декодируем bytes строку в unicode строку
+    decoded_string = input_string.decode('utf-8')
+    decoded_string = urllib.parse.unquote(decoded_string).split('&')
+    for i in range(len(decoded_string)):
+        decoded_string[i] = decoded_string[i].replace('+7', ':Lm').replace('+', ' ').replace(':Lm', '+7')
+
+    # Разбираем строку вручную, сохраняя порядок
+    result_dict = {}
+    products = []
+
+    for item in decoded_string:
+        key, value = item.split("=", 1)  # Разбиваем по первому вхождению '=', чтобы обрабатывать значения с '='
+        key = key.strip()  # Удаляем лишние пробелы в начале и конце ключа
+        value = value.strip() # Удаляем лишние пробелы в начале и конце значения
+
+        if key.startswith("products["):
+            # Обработка продуктов (products[0][name], products[0][price] и т.д.)
+            parts = key.split("[")
+            _, index_str, field_str = parts  # parts: ['products', '0]', 'name]']
+            index = int(index_str[:-1])  # Убираем ']' и преобразуем в int
+            field = field_str[:-1]  # убираем ']'
+
+            if len(products) <= index:
+                products.append({})
+
+            products[index][field] = value
+        else:
+            result_dict[key] = value
+
+    if products:
+        result_dict["products"] = products
+
+    return result_dict
 @csrf_exempt  # Disable CSRF protection for this view (needed for webhooks)
 def webhook_view(request):
     """
@@ -184,15 +231,10 @@ def webhook_view(request):
 
     # Read the request body
     request_body = request.body
+    request_body_dict = convert_string_to_json(request_body)
 
-    # Verify the signature
-    try:
-        request_body_dict = json.loads(request_body.decode('utf-8'))
-    except json.JSONDecodeError:
-        return HttpResponseBadRequest('Invalid JSON format')
-
-
-    if not verify_hmac(request_body_dict, secret_key, signature):
+    n = verify_hmac(request_body_dict, secret_key, signature)
+    if not n:
         return HttpResponseForbidden('Signature is invalid')
 
     # Process the webhook data
@@ -218,7 +260,7 @@ def verify_hmac(data, secret_key, signature):
     Returns:
         True if the signature is valid, False otherwise.
     """
-    message = json.dumps(data, sort_keys=True).encode('utf-8')  # Consistent JSON serialization
+    message = json.dumps(data, sort_keys=False, separators=(',', ':'), ensure_ascii=False).encode('utf-8')
     expected_signature = hmac.new(secret_key.encode('utf-8'), message, hashlib.sha256).hexdigest()
     return hmac.compare_digest(expected_signature, signature)
 
